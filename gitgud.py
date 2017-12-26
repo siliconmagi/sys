@@ -10,9 +10,9 @@ from fuzzyfinder import fuzzyfinder
 Keywords = ['dot', 'sys', 'vim', 'exit']
 time = strftime("%Y-%m-%d %H:%M:%S", localtime())
 cmd = 'git commit -m "' + time + '"'
-pathdot = '~/p/dotfiles'
-pathsys = '~/p/sys'
-pathvim = '~/p/vim'
+pathdot = '~/m/dotfiles'
+pathsys = '~/m/sys'
+pathvim = '~/m/vim'
 
 # array for rsync
 arrdot = [
