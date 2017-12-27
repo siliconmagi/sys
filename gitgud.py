@@ -21,7 +21,7 @@ arrdot = [
     '~/.tmux.conf.local',
     '~/.vimrc',
     '~/.config/xonsh/config.json',
-    '~/.config/alacritty/alacritty.yml',
+    '~/.alacritty.yml',
     '~/.bashrc',
     '~/.config/nvim/init.vim',
     '~/.config/fish/config.fish',
