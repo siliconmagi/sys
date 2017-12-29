@@ -71,35 +71,61 @@ def loginSSH():
         s.interact()
 
 
-def loginFirewall():
+def banIP(banList):
+    """handles banning on firewall"""
     try:
+        def cycle():
+            for x in banList:
+                log.append('cycle start')
+                cmd = 'network-object host {}'.format(x)
+                print(cmd)
+                s.sendline(cmd)
+                log.append(s.before)
+                s.expect('config.*')
+        ip = [x['ip'] for x in ipList if x['name'] == 'firewall'][0]
+        user = [x['user'] for x in ipList if x['name'] == 'firewall'][0]
+        pwd = [x['pwd'] for x in ipList if x['name'] == 'firewall'][0]
         ip2 = [x['ip'] for x in ipList if x['name'] == 'firewall2'][0]
         user2 = [x['user'] for x in ipList if x['name'] == 'firewall2'][0]
         pwd2 = [x['pwd'] for x in ipList if x['name'] == 'firewall2'][0]
+        log = []
         s = pxssh.pxssh()
         s.login(ip, user, pwd)
         s.sendline('whoami')
         s.prompt()
-        print(s.before.decode('unicode_escape'))
+        log.append(s.before.decode('unicode_escape'))
         s.sendline('ssh {}@{}'.format(user2, ip2))
         s.expect('assword.*: ')
         s.sendline(pwd2)
-        print(s.before.decode('unicode_escape'))
+        log.append(s.before.decode('unicode_escape'))
         s.expect('PDCC.*A')
         s.sendline('en')
         s.expect('assword.*: ')
         s.sendline('')
-        print(s.before.decode('unicode_escape'))
+        log.append(s.before.decode('unicode_escape'))
         s.expect('PDCC.*A')
         s.sendline('conf t')
-        print(s.before.decode('unicode_escape'))
-        s.interact()
+        log.append(s.before.decode('unicode_escape'))
+        s.expect('PDCC.*A')
+        s.sendline('object-group network blocklist')
+        log.append(s.before.decode('unicode_escape'))
+        s.expect('config.*')
+        cycle()
+        s.sendline('exit')
+        s.expect('PDCC.*A')
+        s.sendline('exit')
+        s.expect('PDCC.*A')
+        s.sendline('exit')
+        s.expect('PDCC.*A')
+        #  print(log)
+        #  s.interact()
     except pxssh.ExceptionPxssh as e:
         print("pxssh failed on login.")
         print(e)
 
 
-def banIP():
+def loginFirewall():
+    """handles login to firewall from login function"""
     try:
         ip2 = [x['ip'] for x in ipList if x['name'] == 'firewall2'][0]
         user2 = [x['user'] for x in ipList if x['name'] == 'firewall2'][0]
@@ -124,25 +150,24 @@ def banIP():
         s.expect('PDCC.*A')
         s.sendline('object-group network blocklist')
         print(s.before.decode('unicode_escape'))
-        # todo: loop banList
         s.interact()
-
     except pxssh.ExceptionPxssh as e:
         print("pxssh failed on login.")
         print(e)
 
 
 def login(name, ip, user, pwd):
-    # detect rdesktop creds
+    """handles login"""
+    # login rdesktop
     if user == 'administrator' or user == 'sysop':
         bashChain = "{} -u {} -p '{}' {}".format(option, user, pwd, ip)
         execBash(bashChain)
-    # detect firewall, before no pwd condition
+    # login firewall
     elif name == 'firewall':
         loginFirewall()
     elif name == 'ltpop01':
         print('ltpop')
-    # detect ssh w/ no pwd
+    # login ssh where ipList has no password
     # todo: ambk10 interact or run script
     elif pwd == 'none':
         bashChain = "ssh {}@{}".format(user, ip)
@@ -168,7 +193,8 @@ while 1:
                         completer=iceCompleter(),
                         vi_mode=True,
                         )
-    # check input against name in ipList
+
+    # check input
     if user_input in [x['name'] for x in ipList]:
         # parse and store user input
         name = [x['name'] for x in ipList if x['name'] == user_input][0]
@@ -177,10 +203,9 @@ while 1:
         pwd = [x['pwd'] for x in ipList if x['name'] == user_input][0]
         login(name, ip, user, pwd)
     elif user_input == 'banIP':
-        print(banList)
-        banIP()
+        banIP(banList)
     elif user_input == 'exit':
         print('exit')
         exit()
     else:
-        print('Invalid Entry')
+        print('Input not handled')
