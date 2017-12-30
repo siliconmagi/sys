@@ -7,7 +7,7 @@ from prompt_toolkit.completion import Completer, Completion
 from fuzzyfinder import fuzzyfinder
 
 # define vars
-Keywords = ['dot', 'sys', 'vim', 'exit']
+Keywords = ['dot', 'sys', 'vim', 'pull', 'exit']
 time = strftime("%Y-%m-%d %H:%M:%S", localtime())
 cmd = 'git commit -m "' + time + '"'
 pathdot = '~/m/dotfiles'
@@ -21,7 +21,7 @@ arrdot = [
     '~/.tmux.conf.local',
     '~/.vimrc',
     '~/.config/xonsh/config.json',
-    '~/.alacritty.yml',
+    '~/.config/alacritty/alacritty.yml',
     '~/.bashrc',
     '~/.config/nvim/init.vim',
     '~/.config/fish/config.fish',
@@ -35,7 +35,7 @@ arrgit = [
 ]
 
 
-def execBash():
+def execBash(chain):
     process = subprocess.Popen(
         '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = process.communicate(chain.encode('utf-8'))
@@ -67,7 +67,6 @@ while 1:
         listBash.extend(arrgit)
         chain = '; '.join(listBash)
         execBash()
-
     elif user_input == 'sys':
         listBash = ['cd ' + pathsys]
         listBash.extend(arrgit)
@@ -78,6 +77,22 @@ while 1:
         listBash.extend(arrgit)
         chain = '; '.join(listBash)
         execBash()
+    elif user_input == 'pull':
+        chainBash = ['cd {}'.format(pathdot)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+        chainBash = ['cd {}'.format(pathsys)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+        chainBash = ['cd {}'.format(pathvim)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
     elif user_input == 'exit':
         print('exit')
         exit()
