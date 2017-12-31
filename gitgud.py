@@ -77,7 +77,7 @@ while 1:
         listBash.extend(arrgit)
         chain = '; '.join(listBash)
         execBash()
-    elif user_input == 'pull':
+    elif user_input == 'push':
         chainBash = ['cd {}'.format(pathdot)]
         chainBash.extend(arrgit)
         chain = '; '.join(chainBash)
@@ -93,6 +93,23 @@ while 1:
         chain = '; '.join(chainBash)
         print(chain)
         execBash(chain)
+    elif user_input == 'pull':
+        chainBash = ['cd {}'.format(pathdot)]
+        chainBash.append('git pull')
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+        chainBash = ['cd {}'.format(pathsys)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+        chainBash = ['cd {}'.format(pathvim)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+
     elif user_input == 'exit':
         print('exit')
         exit()
