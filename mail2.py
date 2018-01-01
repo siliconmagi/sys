@@ -17,8 +17,18 @@ mntOpt = 'sudo mount -t cifs --rw'
 mntLoc1 = '/mnt/stmail'
 mntLoc2 = '/mnt/stmail02'
 
+# directories to check
+dir1 = '/mnt/stmail/Inetpub/scripts/dreamersi/CheckAccount'
+dir2 = '/mnt/stmail/Inetpub/scripts/dreamersi/Vendors'
+dir3 = '/mnt/stmail/Inetpub/wwwroot/dreamersi/vendors'
+dir4 = '/mnt/stmail/Inetpub/mailroot/Mailbox'
+dir5 = '/mnt/stmail/Inetpub/mailroot/UserInf'
+dir6 = '/mnt/stmail/Inetpub/mailroot/UserExtra'
+dir7 = '/mnt/stmail/Inetpub/mailroot/SpamBox'
+dir8 = '/mnt/stmail/Inetpub/mailroot/mailinglist'
+dir9 = '/mnt/stmail/Inetpub/mailroot/FullList'
 
-# mount commands
+
 def mnt1(st1IP, st1User, st1Pwd):
     mntStr = "{} //{}/f$ -o username='{}',password='{}' {}".format(
         mntOpt,
@@ -47,7 +57,6 @@ def listData():
 
 
 def execBash(chain):
-    '''Does not run in ipython'''
     process = subprocess.Popen(
         '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = process.communicate(chain.encode('utf-8'))
@@ -71,10 +80,10 @@ while 1:
                         vi_mode=True,
                         )
     if user_input == 'mntSt1':
+        #  REFERENCE
         #  chain = mntSt1
         #  chainBash.extend('ls')
         #  chain = '; '.join(chainBash)
-        #  print(deleteList)
         listData()
         st1IP = [x.ip for x in listIP if x[0] == 'stMailDI'][0]
         st1User = [x.user for x in listIP if x[0] == 'stMailDI'][0]
