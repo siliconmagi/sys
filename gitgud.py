@@ -100,12 +100,12 @@ while 1:
         print(chain)
         execBash(chain)
         chainBash = ['cd {}'.format(pathsys)]
-        chainBash.extend(arrgit)
+        chainBash.append('git pull')
         chain = '; '.join(chainBash)
         print(chain)
         execBash(chain)
         chainBash = ['cd {}'.format(pathvim)]
-        chainBash.extend(arrgit)
+        chainBash.append('git pull')
         chain = '; '.join(chainBash)
         print(chain)
         execBash(chain)
