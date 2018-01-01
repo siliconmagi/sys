@@ -7,7 +7,7 @@ from prompt_toolkit.completion import Completer, Completion
 from fuzzyfinder import fuzzyfinder
 
 # define vars
-Keywords = ['dot', 'sys', 'vim', 'pull', 'exit']
+Keywords = ['pull', 'push', 'exit']
 time = strftime("%Y-%m-%d %H:%M:%S", localtime())
 cmd = 'git commit -m "' + time + '"'
 pathdot = '~/m/dotfiles'
@@ -58,26 +58,7 @@ while 1:
                         completer=cli(),
                         vi_mode=True,
                         )
-
-    if user_input == 'dot':
-        # chain bash commands for dotfiles
-        listBash = ['rsync -avz {} {}'.format(x, pathdot)
-                    for x in arrdot]
-        listBash.append('cd ' + pathdot)
-        listBash.extend(arrgit)
-        chain = '; '.join(listBash)
-        execBash()
-    elif user_input == 'sys':
-        listBash = ['cd ' + pathsys]
-        listBash.extend(arrgit)
-        chain = '; '.join(listBash)
-        execBash()
-    elif user_input == 'vim':
-        listBash = ['cd ' + pathvim]
-        listBash.extend(arrgit)
-        chain = '; '.join(listBash)
-        execBash()
-    elif user_input == 'push':
+    if user_input == 'push':
         chainBash = ['cd {}'.format(pathdot)]
         chainBash.extend(arrgit)
         chain = '; '.join(chainBash)

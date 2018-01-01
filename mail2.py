@@ -8,9 +8,26 @@ from prompt_toolkit.completion import Completer, Completion
 from fuzzyfinder import fuzzyfinder
 
 
+Keywords = ['mntSt1', 'exit']
+listIP = []
 SECRET = 'secret.csv'
 fields = ('name', 'ip', 'user', 'pwd')
 dataRecord = namedtuple('dataRecord', fields)
+mntOpt = 'sudo mount -t cifs --rw'
+mntLoc1 = '/mnt/stmail'
+mntLoc2 = '/mnt/stmail02'
+
+
+# mount commands
+def mnt1(st1IP, st1User, st1Pwd):
+    mntStr = "{} //{}/f$ -o username='{}',password='{}' {}".format(
+        mntOpt,
+        st1IP,
+        st1User,
+        st1Pwd,
+        mntLoc1
+    )
+    return mntStr
 
 
 def readData(path):
@@ -23,29 +40,10 @@ def readData(path):
     except ImportError:
         print('secret.csv not found')
 
+
 def listData():
     for row in readData(SECRET):
-        print(row)
-
-
-# define vars
-Keywords = ['mntSt1', 'exit']
-mntOpt = 'sudo mount -t cifs --rw'
-mntLoc1 = '/mnt/stmail'
-mntLoc2 = '/mnt/stmail02'
-st1IP = [x['ip'] for x in ipList if x['name'] == 'stmailDI'][0]
-st1USER = [x['user'] for x in ipList if x['name'] == 'stmailDI'][0]
-st1PWD = [x['pwd'] for x in ipList if x['name'] == 'stmailDI'][0]
-
-# mount commands
-#  [x['name'] for x in ipList if x['name'] == user_input][0]
-#  mntSt1 = '{} //{}/f$ -o username={},password={} {}'.format(
-#  mntOpt,
-#  st1IP,
-#  st1USER,
-#  st1PWD,
-#  mntLoc1
-#  )
+        listIP.append(row)
 
 
 def execBash(chain):
@@ -65,7 +63,7 @@ class cli(Completer):
 
 # prompt options
 while 1:
-    user_input = prompt(u'popREPL>',
+    user_input = prompt(u'mailREPL>',
                         history=FileHistory('history.txt'),
                         auto_suggest=AutoSuggestFromHistory(),
                         completer=cli(),
@@ -76,7 +74,12 @@ while 1:
         #  chainBash.extend('ls')
         #  chain = '; '.join(chainBash)
         #  print(deleteList)
-        print(ipList)
+        listData()
+        print(listIP)
+        st1IP = [x.ip for x in listIP if x[0] == 'stMailDI'][0]
+        st1User = [x.user for x in listIP if x[0] == 'stMailDI'][0]
+        st1Pwd = [x.pwd for x in listIP if x[0] == 'stMailDI'][0]
+        print(mnt1(st1IP, st1User, st1Pwd))
         #  execBash(chain)
     elif user_input == 'exit':
         print('exit')
