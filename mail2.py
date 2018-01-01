@@ -8,7 +8,7 @@ from prompt_toolkit.completion import Completer, Completion
 from fuzzyfinder import fuzzyfinder
 
 
-Keywords = ['mntSt1', 'exit']
+Keywords = ['mntSt1', 'umntSt1', 'exit']
 listIP = []
 SECRET = 'secret.csv'
 fields = ('name', 'ip', 'user', 'pwd')
@@ -47,6 +47,7 @@ def listData():
 
 
 def execBash(chain):
+    '''Does not run in ipython'''
     process = subprocess.Popen(
         '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = process.communicate(chain.encode('utf-8'))
@@ -75,12 +76,16 @@ while 1:
         #  chain = '; '.join(chainBash)
         #  print(deleteList)
         listData()
-        print(listIP)
         st1IP = [x.ip for x in listIP if x[0] == 'stMailDI'][0]
         st1User = [x.user for x in listIP if x[0] == 'stMailDI'][0]
         st1Pwd = [x.pwd for x in listIP if x[0] == 'stMailDI'][0]
-        print(mnt1(st1IP, st1User, st1Pwd))
-        #  execBash(chain)
+        chain = mnt1(st1IP, st1User, st1Pwd)
+        print(chain)
+        execBash(chain)
+    elif user_input == 'umntSt1':
+        chain = 'sudo umount {}' .format(mntLoc1)
+        print(chain)
+        execBash(chain)
     elif user_input == 'exit':
         print('exit')
         exit()
