@@ -136,18 +136,20 @@ while 1:
         sample = [x for x in os.listdir(dir5) if x in deleteList]
         print(sample)
     elif user_input == 'd6':
+        # WORKING:
+        # return l from deleteList where matching charSlice
         charSlice = [x[0:14] for x in deleteList]
-        #  sample = [x for x in os.listdir(dir6) if x]
-        #  sample = [l for l in charSlice for m in [regex.search(l)] if m]
-        matching = [s for s in deleteList if charSlice[1] in s]
-        m2 = [x for x in charSlice if x in deleteList]
-        c = []
-        for bx in charSlice:
-            print(bx)
-            if bx in deleteList:
-                c.append(bx)
-        print(c)
-        #  print(c)
+        t = []
+        l2 = os.listdir(dir6)
+        for x in charSlice:
+            regex = re.compile(x)
+            s = [l for l in l2 for m in [regex.search(l)] if m]
+            #  t.append(s[0])
+            print(s)
+        #  print(t)
+    elif user_input == 'd7':
+        sample = [x for x in os.listdir(dir6) if x in deleteList]
+        print(sample)
     elif user_input == 'test':
         charSlice = [x[0:14] for x in deleteList]
         regex = re.compile('youthchallenge')
@@ -171,16 +173,6 @@ while 1:
         regex = re.compile('^a')
         s = [l for l in deleteList for m in [regex.search(l)] if m]
         print(s)
-    elif user_input == 't4':
-        # WORKING:
-        # return l from deleteList where matching charSlice
-        charSlice = [x[0:14] for x in deleteList]
-        t = []
-        for x in charSlice:
-            regex = re.compile(x)
-            s = [l for l in deleteList for m in [regex.search(l)] if m]
-            t.append(s[0])
-        print(t)
     elif user_input == 'regex':
         charSlice = [x[0:14] for x in deleteList]
         regex = re.compile('youthchallenge')
