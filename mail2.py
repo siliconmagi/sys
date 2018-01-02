@@ -8,12 +8,15 @@ from prompt_toolkit.completion import Completer, Completion
 from fuzzyfinder import fuzzyfinder
 
 
-Keywords = ['mntSt1', 'umntSt1', 'exit']
+Keywords = ['mntSt1', 'umntSt1', 'check', 'exit']
 listIP = []
+listDelete = []
 SECRET = 'secret.csv'
+DELETE = 'deleteList.csv'
 fields = ('name', 'ip', 'user', 'pwd')
 dataRecord = namedtuple('dataRecord', fields)
-mntOpt = 'sudo mount -t cifs --rw'
+mntOpt = 'sudo mount -t cifs --ro'
+#  mntOpt = 'sudo mount -t cifs --rw'
 mntLoc1 = '/mnt/stmail'
 mntLoc2 = '/mnt/stmail02'
 
@@ -30,6 +33,7 @@ dir9 = '/mnt/stmail/Inetpub/mailroot/FullList'
 
 
 def mnt1(st1IP, st1User, st1Pwd):
+    '''Mount String'''
     mntStr = "{} //{}/f$ -o username='{}',password='{}' {}".format(
         mntOpt,
         st1IP,
@@ -43,17 +47,22 @@ def mnt1(st1IP, st1User, st1Pwd):
 def readData(path):
     try:
         with open(path, newline='') as data:
-            data.readline()            # Skip the header
-            reader = csv.reader(data)  # Create a regular tuple reader
+            data.readline()
+            reader = csv.reader(data)
             for row in map(dataRecord._make, reader):
                 yield row
     except ImportError:
         print('secret.csv not found')
 
 
-def listData():
+def listifyIP():
     for row in readData(SECRET):
         listIP.append(row)
+
+
+def listifyDelete():
+    for row in readData(DELETE):
+        listDelete.append(row)
 
 
 def execBash(chain):
@@ -76,15 +85,14 @@ while 1:
     user_input = prompt(u'mailREPL>',
                         history=FileHistory('history.txt'),
                         auto_suggest=AutoSuggestFromHistory(),
-                        completer=cli(),
-                        vi_mode=True,
+                        completer=cli()
                         )
     if user_input == 'mntSt1':
         #  REFERENCE
         #  chain = mntSt1
         #  chainBash.extend('ls')
         #  chain = '; '.join(chainBash)
-        listData()
+        listifyIP()
         st1IP = [x.ip for x in listIP if x[0] == 'stMailDI'][0]
         st1User = [x.user for x in listIP if x[0] == 'stMailDI'][0]
         st1Pwd = [x.pwd for x in listIP if x[0] == 'stMailDI'][0]
@@ -95,6 +103,9 @@ while 1:
         chain = 'sudo umount {}' .format(mntLoc1)
         print(chain)
         execBash(chain)
+    elif user_input == 'check':
+        listifyIP()
+        print(listIP)
     elif user_input == 'exit':
         print('exit')
         exit()
