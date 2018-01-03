@@ -12,7 +12,7 @@ from fuzzyfinder import fuzzyfinder
 
 # SETUP
 # dictionary globals
-dictDir = {
+dicM1 = {
     # .txt, .cnt
     'dir1': '/mnt/stmail/Inetpub/scripts/dreamersi/CheckAccount',
     # folders
@@ -24,17 +24,38 @@ dictDir = {
     # folders
     'dir5': '/mnt/stmail/Inetpub/mailroot/UserInf',
     # youthchallenge010001, yoshidarivervi010001 (14 char)
+    # files
     'dir6': '/mnt/stmail/Inetpub/mailroot/UserExtra',
     # folders
     'dir7': '/mnt/stmail/Inetpub/mailroot/SpamBox',
     # .txt
     'dir8': '/mnt/stmail/Inetpub/mailroot/mailinglist'
 }
+dicM2 = {
+    # .txt, .cnt
+    'dir1': '/mnt/stmail02/Inetpub/scripts/dreamersi/CheckAccount',
+    # folders
+    'dir2': '/mnt/stmail02/Inetpub/scripts/dreamersi/Vendors',
+    # folders
+    'dir3': '/mnt/stmail02/Inetpub/wwwroot/dreamersi/vendors',
+    # folders
+    'dir4': '/mnt/stmail02/Inetpub/mailroot/Mailbox',
+    # folders
+    'dir5': '/mnt/stmail02/Inetpub/mailroot/UserInf',
+    # youthchallenge010001, yoshidarivervi010001 (14 char)
+    # files
+    'dir6': '/mnt/stmail02/Inetpub/mailroot/UserExtra',
+    # folders
+    'dir7': '/mnt/stmail02/Inetpub/mailroot/SpamBox',
+    # .txt
+    'dir8': '/mnt/stmail02/Inetpub/mailroot/mailinglist'
+}
 Keywords = ['mntStMailDI', 'umntStMailDI', 'exit']
-Keywords.extend([x for x in dictDir])
+Keywords.extend([x for x in dicM1])
 print(Keywords)
 ipList = []
 deleteList = []
+nestedList = []
 mntOpt = 'sudo mount -t cifs --ro'
 #  mntOpt = 'sudo mount -t cifs --rw'
 mntLoc1 = '/mnt/stmail'
@@ -65,20 +86,35 @@ mailPwd = [x.pwd for x in ipList if x[0] == 'stMailDI'][0]
 
 
 def dirN(nameX, dirX):
-    ''' returns:
-    list of lists where a line in deleteList matches
-    an item(s) in list of os directory items
+    ''' returns: list of lists, file of nameX.txt
+    where a line in deleteList searches for match in dirList
     '''
     outList = []
     dirList = os.listdir(dirX)
     for x in deleteList:
         regex = re.compile(x)
+        # magic code: returns item in list
+        # if it matches in another list
         s = [l for l in dirList for m in [regex.search(l)] if m]
         outList.append(s)
-        with open('{}.txt'.format(nameX), 'w') as file_handler:
-            for item in outList:
-                file_handler.write("{}\n".format(item))
-                print(outList)
+    with open('{}.csv'.format(nameX), 'w') as file_handler:
+        for item in outList:
+            file_handler.write("{}\n".format(item))
+    # print(outList)
+    # create flatList from nested outList
+    flatList = [l for sublist in outList for l in sublist]
+    if nameX == 'dir1':
+        c = ['cp {}/{} {}/{}'.format(dicM1[nameX], i, dicM2[nameX], i)
+             for i in flatList]
+    elif nameX == 'dir2':
+        c = ['rsync -av {}/{}/ {}/{}/'.format(dicM1[nameX], i, dicM2[nameX], i)
+             for i in flatList]
+    else:
+        print('nameX not recognized')
+    print(c)
+    with open('{}cmd.csv'.format(nameX), 'w') as file_handler:
+        for item in c:
+            file_handler.write("{}\n".format(item))
 
 
 def mnt1():
@@ -115,10 +151,6 @@ while 1:
                         completer=cli()
                         )
     if user_input == 'mntStMailDI':
-        #  REFERENCE
-        #  chain = mntSt1
-        #  chainBash.extend('ls')
-        #  chain = '; '.join(chainBash)
         chain = mnt1()
         print(chain)
         execBash(chain)
@@ -126,11 +158,21 @@ while 1:
         chain = 'sudo umount {}' .format(mntLoc1)
         print(chain)
         execBash(chain)
-    # match input against dictDir and autofill dirN()
-    elif user_input in [x for x in dictDir]:
+    # match input against dicM1 and autofill dirN()
+    elif user_input in [x for x in dicM1]:
         nameX = user_input
-        dirX = dictDir[nameX]
+        dirX = dicM1[nameX]
         dirN(nameX, dirX)
+    elif user_input == 'cp':
+        try:
+            with open("dir1.csv", newline="") as infile:
+                reader = csv.reader(infile)
+                nestedList = [line.strip() for line in infile]
+        except ImportError:
+            print('dir1.csv not found')
+        print(nestedList)
+        #  flatList = [l for sublist in nestedList for l in sublist]
+        #  print(flatList)
     elif user_input == 'exit':
         print('exit')
         exit()
