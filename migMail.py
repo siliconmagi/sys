@@ -56,6 +56,8 @@ print(Keywords)
 ipList = []
 deleteList = []
 nestedList = []
+fileList = ['dir1', 'dir6', 'dir8']
+folderList = ['dir2', 'dir3', 'dir4', 'dir5', 'dir7']
 mntOpt = 'sudo mount -t cifs --ro'
 #  mntOpt = 'sudo mount -t cifs --rw'
 mntLoc1 = '/mnt/stmail'
@@ -86,7 +88,11 @@ mailPwd = [x.pwd for x in ipList if x[0] == 'stMailDI'][0]
 
 
 def dirN(nameX, dirX):
-    ''' returns: list of lists, file of nameX.txt
+    '''
+    returns:
+    list of lists,
+    files nameX.txt,
+    commands nameXcmd.txt
     where a line in deleteList searches for match in dirList
     '''
     outList = []
@@ -94,7 +100,7 @@ def dirN(nameX, dirX):
     for x in deleteList:
         regex = re.compile(x)
         # magic code: returns item in list
-        # if it matches in another list
+        # if it matches any element in another list
         s = [l for l in dirList for m in [regex.search(l)] if m]
         outList.append(s)
     with open('{}.csv'.format(nameX), 'w') as file_handler:
@@ -103,10 +109,10 @@ def dirN(nameX, dirX):
     # print(outList)
     # create flatList from nested outList
     flatList = [l for sublist in outList for l in sublist]
-    if nameX == 'dir1':
+    if nameX in fileList:
         c = ['cp {}/{} {}/{}'.format(dicM1[nameX], i, dicM2[nameX], i)
              for i in flatList]
-    elif nameX == 'dir2':
+    elif nameX in folderList:
         c = ['rsync -av {}/{}/ {}/{}/'.format(dicM1[nameX], i, dicM2[nameX], i)
              for i in flatList]
     else:
@@ -163,18 +169,8 @@ while 1:
         nameX = user_input
         dirX = dicM1[nameX]
         dirN(nameX, dirX)
-    elif user_input == 'cp':
-        try:
-            with open("dir1.csv", newline="") as infile:
-                reader = csv.reader(infile)
-                nestedList = [line.strip() for line in infile]
-        except ImportError:
-            print('dir1.csv not found')
-        print(nestedList)
-        #  flatList = [l for sublist in nestedList for l in sublist]
-        #  print(flatList)
     elif user_input == 'exit':
         print('exit')
         exit()
     else:
-        print('Invalid Entry')
+        print('Unrecognized Input')
