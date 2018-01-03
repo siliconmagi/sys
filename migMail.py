@@ -11,15 +11,26 @@ from fuzzyfinder import fuzzyfinder
 
 
 # SETUP
-# initialize vars
 # dictionary globals
 dictDir = {
     # .txt, .cnt
     'dir1': '/mnt/stmail/Inetpub/scripts/dreamersi/CheckAccount',
     # folders
-    'dir2': '/mnt/stmail/Inetpub/scripts/dreamersi/Vendors'
+    'dir2': '/mnt/stmail/Inetpub/scripts/dreamersi/Vendors',
+    # folders
+    'dir3': '/mnt/stmail/Inetpub/wwwroot/dreamersi/vendors',
+    # folders
+    'dir4': '/mnt/stmail/Inetpub/mailroot/Mailbox',
+    # folders
+    'dir5': '/mnt/stmail/Inetpub/mailroot/UserInf',
+    # youthchallenge010001, yoshidarivervi010001 (14 char)
+    'dir6': '/mnt/stmail/Inetpub/mailroot/UserExtra',
+    # folders
+    'dir7': '/mnt/stmail/Inetpub/mailroot/SpamBox',
+    # .txt
+    'dir8': '/mnt/stmail/Inetpub/mailroot/mailinglist'
 }
-Keywords = ['mntStMailDI', 'umntStMailDI', 'check', 'exit']
+Keywords = ['mntStMailDI', 'umntStMailDI', 'exit']
 Keywords.extend([x for x in dictDir])
 print(Keywords)
 ipList = []
@@ -28,27 +39,6 @@ mntOpt = 'sudo mount -t cifs --ro'
 #  mntOpt = 'sudo mount -t cifs --rw'
 mntLoc1 = '/mnt/stmail'
 mntLoc2 = '/mnt/stmail02'
-
-# directories to check
-# .txt, .cnt
-dir1 = '/mnt/stmail/Inetpub/scripts/dreamersi/CheckAccount'
-# folders
-dir2 = '/mnt/stmail/Inetpub/scripts/dreamersi/Vendors'
-# folders
-dir3 = '/mnt/stmail/Inetpub/wwwroot/dreamersi/vendors'
-# folders
-dir4 = '/mnt/stmail/Inetpub/mailroot/Mailbox'
-# folders
-dir5 = '/mnt/stmail/Inetpub/mailroot/UserInf'
-# youthchallenge010001, yoshidarivervi010001 (14 char)
-dir6 = '/mnt/stmail/Inetpub/mailroot/UserExtra'
-# folders
-dir7 = '/mnt/stmail/Inetpub/mailroot/SpamBox'
-# .txt
-dir8 = '/mnt/stmail/Inetpub/mailroot/mailinglist'
-# nothing:
-#  dir9 = '/mnt/stmail/Inetpub/mailroot/FullList'
-
 
 # read deleteList.csv into list
 try:
@@ -77,7 +67,7 @@ mailPwd = [x.pwd for x in ipList if x[0] == 'stMailDI'][0]
 def dirN(nameX, dirX):
     ''' returns:
     list of lists where a line in deleteList matches
-    an item(s) in os directory list
+    an item(s) in list of os directory items
     '''
     outList = []
     dirList = os.listdir(dirX)
@@ -88,7 +78,7 @@ def dirN(nameX, dirX):
         with open('{}.txt'.format(nameX), 'w') as file_handler:
             for item in outList:
                 file_handler.write("{}\n".format(item))
-    print(outList)
+                print(outList)
 
 
 def mnt1():
@@ -136,69 +126,11 @@ while 1:
         chain = 'sudo umount {}' .format(mntLoc1)
         print(chain)
         execBash(chain)
-    elif user_input == 'check':
-        chain = 'cd {}; ls'.format(dir1)
-        print(chain)
-        execBash(chain)
-    elif user_input == 'deleteList':
-        print(deleteList)
+    # match input against dictDir and autofill dirN()
     elif user_input in [x for x in dictDir]:
         nameX = user_input
         dirX = dictDir[nameX]
         dirN(nameX, dirX)
-    elif user_input == 'd3':
-        nameX = user_input
-        dirX = dir3
-        dirN(nameX, dirX)
-    elif user_input == 'd4':
-        sample = [x for x in os.listdir(dir4) if x in deleteList]
-        print(sample)
-    elif user_input == 'd5':
-        sample = [x for x in os.listdir(dir5) if x in deleteList]
-        print(sample)
-    elif user_input == 'd6':
-        # WORKING:
-        # return l from deleteList where matching charSlice
-        charSlice = [x[0:14] for x in deleteList]
-        t = []
-        l2 = os.listdir(dir6)
-        for x in charSlice:
-            regex = re.compile(x)
-            s = [l for l in l2 for m in [regex.search(l)] if m]
-            #  t.append(s[0])
-            t.append(s)
-        print(t)
-    elif user_input == 'd7':
-        sample = [x for x in os.listdir(dir6) if x in deleteList]
-        print(sample)
-    elif user_input == 'test':
-        charSlice = [x[0:14] for x in deleteList]
-        regex = re.compile('youthchallenge')
-        t = []
-        for x in charSlice:
-            s = [l for l in deleteList for m in [regex.search(x)] if m]
-            t.append(s)
-        print(t)
-    elif user_input == 't2':
-        charSlice = [x[0:14] for x in deleteList]
-        t = []
-        for a in charSlice:
-            regex = re.compile(a)
-            s = regex.search(a)
-            #  s = [l for l in deleteList for m in [regex.search(a)] if m]
-            print(s.group())
-            #  t.append(s)
-        print(t)
-    elif user_input == 't3':
-        charSlice = [x[0:14] for x in deleteList]
-        regex = re.compile('^a')
-        s = [l for l in deleteList for m in [regex.search(l)] if m]
-        print(s)
-    elif user_input == 'regex':
-        charSlice = [x[0:14] for x in deleteList]
-        regex = re.compile('youthchallenge')
-        sample = [l for l in deleteList for m in [regex.search(l)] if m]
-        print(sample)
     elif user_input == 'exit':
         print('exit')
         exit()
