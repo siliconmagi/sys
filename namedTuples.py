@@ -38,7 +38,7 @@ dir7 = '/mnt/stmail/Inetpub/mailroot/SpamBox'
 # .txt
 dir8 = '/mnt/stmail/Inetpub/mailroot/mailinglist'
 # nothing:
-dir9 = '/mnt/stmail/Inetpub/mailroot/FullList'
+#  dir9 = '/mnt/stmail/Inetpub/mailroot/FullList'
 
 # read csv into list
 try:
@@ -116,9 +116,22 @@ while 1:
     elif user_input == 'deleteList':
         print(deleteList)
     elif user_input == 'd1':
-        addExt = [s + '.txt' for s in deleteList]
-        sample = [x for x in os.listdir(dir1) if x in addExt]
-        print(sample)
+        ''' returns:
+        list of lists where a line in deleteList matches
+        an item(s) in os directory list
+        '''
+        ld1 = []
+        listDir = os.listdir(dir1)
+        for x in deleteList:
+            regex = re.compile(x)
+            s = [l for l in listDir for m in [regex.search(l)] if m]
+            #  t.append(s[0])
+            ld1.append(s)
+        print(ld1)
+        with open('d1.txt', 'w') as file_handler:
+            for item in ld1:
+                file_handler.write("{}\n".format(item))
+                print(ld1)
     elif user_input == 'd2':
         sample = [x for x in os.listdir(dir2) if x in deleteList]
         # write results to d2.txt
@@ -145,8 +158,8 @@ while 1:
             regex = re.compile(x)
             s = [l for l in l2 for m in [regex.search(l)] if m]
             #  t.append(s[0])
-            print(s)
-        #  print(t)
+            t.append(s)
+        print(t)
     elif user_input == 'd7':
         sample = [x for x in os.listdir(dir6) if x in deleteList]
         print(sample)
