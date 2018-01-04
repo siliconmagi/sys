@@ -89,26 +89,23 @@ mailPwd = [x.pwd for x in ipList if x[0] == 'stMailDI'][0]
 
 def dirN(nameX, dirX):
     '''
-    returns:
-    list of lists,
-    files nameX.txt,
-    commands nameXcmd.txt
-    where a line in deleteList searches for match in dirList
+    Dynamic regex searches each item in deleteList to dirList
+    Returns successful search instances as a list
     '''
     outList = []
     dirList = os.listdir(dirX)
     for x in deleteList:
         regex = re.compile(x)
-        # magic code: returns item in list
-        # if it matches any element in another list
+        # dynamic regex search each item in deleteList against dirList
         s = [l for l in dirList for m in [regex.search(l)] if m]
         outList.append(s)
+    # write list of result instances
     with open('{}.csv'.format(nameX), 'w') as file_handler:
         for item in outList:
             file_handler.write("{}\n".format(item))
-    # print(outList)
-    # create flatList from nested outList
+    # create flatList of shell commands from outList
     flatList = [l for sublist in outList for l in sublist]
+    # check file type
     if nameX in fileList:
         c = ['cp {}/{} {}/{}'.format(dicM1[nameX], i, dicM2[nameX], i)
              for i in flatList]
@@ -118,6 +115,7 @@ def dirN(nameX, dirX):
     else:
         print('nameX not recognized')
     print(c)
+    # write flatList
     with open('{}cmd.csv'.format(nameX), 'w') as file_handler:
         for item in c:
             file_handler.write("{}\n".format(item))
@@ -136,6 +134,7 @@ def mnt1():
 
 
 def execBash(chain):
+    '''bash chain handler'''
     process = subprocess.Popen(
         '/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = process.communicate(chain.encode('utf-8'))
@@ -143,6 +142,7 @@ def execBash(chain):
 
 
 class cli(Completer):
+    '''setup REPL'''
     def get_completions(self, document, complete_event):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
         matches = fuzzyfinder(word_before_cursor, Keywords)
@@ -151,6 +151,7 @@ class cli(Completer):
 
 
 while 1:
+    '''create REPL prompt'''
     user_input = prompt(u'mailREPL>',
                         history=FileHistory('history.txt'),
                         auto_suggest=AutoSuggestFromHistory(),
@@ -164,7 +165,7 @@ while 1:
         chain = 'sudo umount {}' .format(mntLoc1)
         print(chain)
         execBash(chain)
-    # match input against dicM1 and autofill dirN()
+    # match input from dicM1 keys and autofill dirN()
     elif user_input in [x for x in dicM1]:
         nameX = user_input
         dirX = dicM1[nameX]
