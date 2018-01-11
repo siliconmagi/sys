@@ -25,6 +25,7 @@ arrdot = [
     '~/.bashrc',
     '~/.config/nvim/init.vim',
     '~/.config/fish/config.fish',
+    '~/.config/ion/initrc'
 ]
 
 # array for github
