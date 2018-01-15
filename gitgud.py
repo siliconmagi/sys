@@ -13,6 +13,7 @@ cmd = 'git commit -m "' + time + '"'
 pathdot = '~/m/dotfiles'
 pathsys = '~/m/sys'
 pathvim = '~/m/vim'
+pathnx = '~/m/nx1'
 
 # array for rsync
 arrdot = [
@@ -71,6 +72,11 @@ while 1:
         print(chain)
         execBash(chain)
         chainBash = ['cd {}'.format(pathvim)]
+        chainBash.extend(arrgit)
+        chain = '; '.join(chainBash)
+        print(chain)
+        execBash(chain)
+        chainBash = ['cd {}'.format(pathnx)]
         chainBash.extend(arrgit)
         chain = '; '.join(chainBash)
         print(chain)
