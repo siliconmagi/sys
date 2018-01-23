@@ -52,7 +52,7 @@ def loginSSH():
     s = pxssh.pxssh()
     s.SSH_OPTS = "-o 'RSAAuthentication=no' -o 'PubKeyAuthentication=no'"
     s.login(ip, user, pwd)
-    s.sendline('whoami;uname -a')
+    #  s.sendline('whoami;uname -a')
     before = s.before.decode('unicode_escape')
     if 'psp' in before:
         s.sendline('sudo su -')
