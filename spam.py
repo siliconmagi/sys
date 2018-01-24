@@ -30,6 +30,11 @@ mailq = "mailq | grep Jan | awk '{print $7}' | sort | uniq -c | sort -n"
 
 def mqFind(findX):
     return "mailq | grep Jan | grep '{}' | awk '{{print $1}}'".format(findX)
+
+
+def ipFind(findX):
+    return "cat /var/spool/mqueue/{}".format(findX)
+
 #  | awk -F '*' '{print $1}' | postsuper -d -
 #  mailq | grep Jan | awk '{print $7}' | sort | uniq -c | sort -n
 # rdesktop options
@@ -94,7 +99,7 @@ def login(in0):
     z2 = [i.split(' ')[1] for i in f1]
     # zip names as list of tuples
     t0 = zip(z2, z1)
-    # decending roder by value
+    # descending order by value
     t1 = sorted(list(t0), key=lambda x: x[1])
     # remove all rows from table Emails
     c.execute('delete from Emails')
@@ -110,8 +115,19 @@ def login(in0):
     for row in r1:
         s.sendline(mqFind(row[0]))
         s.prompt()
-        findOut = s.before
-        print(findOut)
+        find0 = s.before.decode('utf-8')
+        # extract str starting with 'w08' until \w
+        find1 = re.findall(r'(w0N.*\w)', find0)
+        find2 = 'qf{}'.format(find1[0])
+        s.sendline(ipFind(find2))
+        s.prompt()
+        # necessary encoding for message
+        ip0 = s.before.decode('ISO-8859-1')
+        #  print(ip0)
+        # get ip regex
+        ip1 = re.findall(r'Received:.*\[(.*)\]', ip0)[-1]
+        print(ip1)
+
     # test cat
     s.sendline('uname')
     s.prompt()

@@ -10,6 +10,23 @@ import sqlite3
 
 # rdesktop options
 option = 'rdesktop -g 1920x1000 -x 0x81'
+
+# setup bounding box from screengrab
+stX1 = 13
+stY1 = 150
+stX2 = 200
+stY2 = 200
+stXR = int((stX2 - stX1) * 2.5)
+stYR = int((stY2 - stY1) * 1.5)
+
+# setup bounding box from screengrab
+sanX1 = 580
+sanY1 = 350
+sanX2 = 685
+sanY2 = 420
+sanXR = int((sanX2 - sanX1) * 2)
+sanYR = int((sanY2 - sanY1) * 1.5)
+
 # setup sqlite
 conn = sqlite3.connect('hour.db')
 c = conn.cursor()
@@ -74,48 +91,42 @@ def grab(server):
         exit("Could not create a child process")
     # child process
     if pid == 0:
-        time.sleep(3)
-        # comp right
-        #  img = ImageGrab.grab(bbox=(605, 350, 685, 420))
-        # comp left
-        img = ImageGrab.grab(bbox=(1940, 350, 2050, 420))
-        #  img2 = img.resize((80, 70), Image.ANTIALIAS)
-        img2 = img.resize((195, 140), Image.ANTIALIAS)
-        #  img = ImageGrab.grab()
-        img2.save("ots.png")
-        img2 = cv2.imread('ots.png')
+        file0 = '{}.png'.format(server)
+        time.sleep(5)
+        if server == 'stMailDI':
+            bbX1 = stX1
+            bbY1 = stY1
+            bbX2 = stX2
+            bbY2 = stY2
+            bbXR = stXR
+            bbYR = stYR
+        else:
+            bbX1 = sanX1
+            bbY1 = sanY1
+            bbX2 = sanX2
+            bbY2 = sanY2
+            bbXR = sanXR
+            bbYR = sanYR
+        img = ImageGrab.grab(bbox=(bbX1, bbY1, bbX2, bbY2))
+        img2 = img.resize((bbXR, bbYR), Image.ANTIALIAS)
+        img2.save(file0)
+        img2 = cv2.imread(file0)
         gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite('ots.png', gray)
+        cv2.imwrite(file0, gray)
         os.system('pkill rdesktop')
         text = pytesseract.image_to_string(
-            Image.open(os.path.abspath('ots.png')))
-        # remove all rows from table Emails
-        #  c.execute('delete from Servers')
+            Image.open(os.path.abspath(file0)))
         # save list of tuples to sqlite table
         t0 = (server, text.encode('utf-8'))
         sql = 'insert into Servers (name, out) values (?,?)'
         c.execute(sql, t0)
         conn.commit()
-        # regex extract text before 'trac'
-        #  print(text.encode('utf-8'))
         exit()
     # parent process
     login(server)
-    #  login('psp10san')
-    #  print('ots.png complete')
-    #  print('psp10san.png complete')
 
 
+grab('stMailDI')
 grab('ots10san1')
 grab('psp10san')
-sql = 'select {cn} from {tn} where {ct}="ots10san1"'.format(
-    cn='out',
-    tn='Servers',
-    ct='name')
-c.execute(sql)
-sRows = c.fetchone()
-print(type(sRows))
-print(sRows)
-print(sRows[1])
-
 conn.close()
