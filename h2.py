@@ -12,20 +12,33 @@ import sqlite3
 option = 'rdesktop -g 1920x1000 -x 0x81'
 
 # setup bounding box from screengrab
-stX1 = 13
-stY1 = 150
-stX2 = 200
-stY2 = 200
+stX1 = 1372
+stY1 = 153
+stX2 = stX1 + 148
+stY2 = stY1 + 47
+#  stX1 = 13
+#  stY1 = 150
+#  stX2 = 200
+#  stY2 = 200
 stXR = int((stX2 - stX1) * 2.5)
 stYR = int((stY2 - stY1) * 1.5)
+#  stXR = int((stX2 - stX1) * 1)
+#  stYR = int((stY2 - stY1) * 1)
 
 # setup bounding box from screengrab
-sanX1 = 580
+sanX1 = 1920
 sanY1 = 350
-sanX2 = 685
-sanY2 = 420
+sanX2 = sanX1 + 143
+sanY2 = sanY1 + 70
+#  sanX1 = 580
+#  sanY1 = 350
+#  sanX2 = 685
+#  sanY2 = 420
 sanXR = int((sanX2 - sanX1) * 2)
 sanYR = int((sanY2 - sanY1) * 1.5)
+#  sanXR = int((sanX2 - sanX1) * 1)
+#  sanYR = int((sanY2 - sanY1) * 1)
+
 
 # setup sqlite
 conn = sqlite3.connect('hour.db')

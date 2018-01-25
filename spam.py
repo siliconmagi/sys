@@ -27,6 +27,10 @@ c.execute('CREATE TABLE {tn} (\
 # global vars
 mailq = "mailq | grep Jan | awk '{print $7}' | sort | uniq -c | sort -n"
 
+#  mailq | grep Jan | grep 'ex@alpha-enterprise.co.jp' | awk '{print $1}'
+
+#  mailq | grep Jan | grep 'h-takahashi@adrs-s.co.jp' | awk '{print $1}'
+
 
 def mqFind(findX):
     return "mailq | grep Jan | grep '{}' | awk '{{print $1}}'".format(findX)
@@ -110,21 +114,24 @@ def login(in0):
     [print(row) for row in r0]
     c.execute('select * from Emails where count>1')
     r1 = c.fetchall()
-    [print(row[0]) for row in r1]
     # iterate rows for message ID
     for row in r1:
         s.sendline(mqFind(row[0]))
         s.prompt()
-        find0 = s.before.decode('utf-8')
+        find0 = s.before.decode('ISO-8859-1')
         # extract str starting with 'w08' until \w
-        find1 = re.findall(r'(w0N.*\w)', find0)
+        print(find0)
+        find1 = re.findall(r'(w0.*\w)', find0)
+        #  print(find1)
+        #  get first msgID
         find2 = 'qf{}'.format(find1[0])
+        print(find2)
         s.sendline(ipFind(find2))
         s.prompt()
         # necessary encoding for message
         ip0 = s.before.decode('ISO-8859-1')
         #  print(ip0)
-        # get ip regex
+        # get ip using msgID
         ip1 = re.findall(r'Received:.*\[(.*)\]', ip0)[-1]
         print(ip1)
 
