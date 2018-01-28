@@ -3,16 +3,21 @@ import sqlite3
 import re
 import codecs
 
+# mail setup
+shift0 = ['David', 'Jordan B.', 'Matthew']
+to = 'mariko.adams@pspinc.com, hirotaka.sato@pspinc.com'
+cc = 'serveradmin@pspinc.com, mayumi.nakamura@pspinc.com'
+subj = 'Hourly Report 1/25/2018 6:00AM'
 
 # setup sqlite
 conn = sqlite3.connect('hour.db')
 c = conn.cursor()
 c.execute('select * from Servers')
 r0 = c.fetchall()
+print(r0)
 stm = r0[0][1].decode('utf-8')
 ots = r0[1][1].decode('utf-8')
 psp = r0[2][1].decode('utf-8')
-shift0 = ['David', 'Jordan B.', 'Matthew']
 
 
 def parse(server):
@@ -33,13 +38,20 @@ def parse(server):
         out4 = Decimal(12 * (float(out3[-1]) / 100))
         return str(round(out4, 1))
     else:
+        if out2[0][1] == '.':
+            avg = out2[0].replace('.', ',', 1)
+        else:
+            avg = out2[0]
+        avg2 = avg.split('.')[0]
+        tot = out2[1].split('.')[0]
         read = out2[2][0:2]
         write = Decimal(str(100 - float(read)))
-        out4 = [out2[0], out2[1], read, round(write, 0)]
+        out4 = [avg2, tot, read, round(write)]
         return out4
 
 
 # string together hourly
+pre = '{}\n{}\n{}'.format(to, cc, subj)
 stm0 = 'ST-MAIL-DI:\n{} / 12 GB Total Memory Usage' \
     .format(parse(stm))
 ots0 = 'OTS10SAN1\nAverage IOPS (past 1HR) - {} / {}' \
@@ -59,7 +71,7 @@ tasks = 'Tasks{}'.format(
 shift1 = ['- {}'.format(i) for i in shift0]
 shift2 = 'On shift:\n' + '\n'.join(shift1)
 #  shift0 = 'On shift:\n'.join(here)
-txt = [stm0, ots2, psp2, ongoing, resolved, tasks, shift2]
+txt = [pre, stm0, ots2, psp2, ongoing, resolved, tasks, shift2]
 print('\n\n'.join(txt))
 file = codecs.open("hour", "w", "utf-8")
 file.write(u'\n\n'.join(txt))
