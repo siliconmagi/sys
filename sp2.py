@@ -66,7 +66,7 @@ def execBash(bashChain):
     print(out.decode('utf-8'))
 
 
-def login(in0):
+def dumpMQ(in0):
     # extract connection info from secret
     ip = [x['ip'] for x in ipList if x['name'] == in0][0]
     user = [x['user'] for x in ipList if x['name'] == in0][0]
@@ -87,16 +87,12 @@ def login(in0):
     # remove first and last element from list
     s1 = s0[1:-1]
     # list element must contain key and value
-    print(s1)
-    # TODO:  broken regex for neos
-    regex = re.compile(r'^\d <.*\w.*>')
+    regex = re.compile(r'^\d \w.*')
     f0 = [m.group(0) for l in s1 for m in [regex.search(l)] if m]
-    # remove brackets in email
-    f1 = [re.sub('<|>', '', l) for l in f0]
     # split name
-    z1 = [i.split(' ')[0] for i in f1]
+    z1 = [i.split(' ')[0] for i in f0]
     # split instances
-    z2 = [i.split(' ')[1] for i in f1]
+    z2 = [i.split(' ')[1] for i in f0]
     # zip names as list of tuples
     t0 = zip(z2, z1)
     # descending order by value
@@ -108,35 +104,6 @@ def login(in0):
     c.execute('select * from Emails')
     r0 = c.fetchall()
     [print(row) for row in r0]
-    c.execute('select * from Emails where count>1')
-    r1 = c.fetchall()
-    # iterate rows for message ID
-    for row in r1:
-        s.sendline(mqFind(row[0]))
-        s.prompt()
-        find0 = s.before.decode('ISO-8859-1')
-        # extract str starting with 'w08' until \w
-        print(find0)
-        find1 = re.findall(r'(w0.*\w)', find0)
-        #  print(find1)
-        #  get first msgID
-        find2 = 'qf{}'.format(find1[0])
-        print(find2)
-        s.sendline(ipFind(find2))
-        s.prompt()
-        # necessary encoding for message
-        ip0 = s.before.decode('ISO-8859-1')
-        #  print(ip0)
-        # get ip using msgID
-        ip1 = re.findall(r'Received:.*\[(.*)\]', ip0)[-1]
-        print(ip1)
-
-    # test cat
-    s.sendline('uname')
-    s.prompt()
-    catOut = s.before
-    print(catOut)
-    #  curl ipinfo.io/210.189.28.2
     conn.commit()
     s.logout()
 
@@ -159,7 +126,7 @@ while 1:
 
     # check input
     if user_input in [x['name'] for x in ipList]:
-        login(user_input)
+        dumpMQ(user_input)
     elif user_input == 'exit':
         conn.close()
         exit()
