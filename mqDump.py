@@ -103,26 +103,6 @@ def dumpMQ(in0):
     c.executemany('insert into Emails (email, count) values (?,?)', t1)
     c.execute('select * from Emails')
     r0 = c.fetchall()
-    for row in r0:
-        s.sendline(mqFind(row[0]))
-        s.prompt()
-        find0 = s.before.decode('ISO-8859-1')
-        # extract str starting with 'w08' until \w
-        print(find0)
-        find1 = re.findall(r'(w0.*\w)', find0)
-        #  print(find1)
-        #  get first msgID
-        find2 = 'qf{}'.format(find1[0])
-        print(find2)
-        s.sendline(ipFind(find2))
-        s.prompt()
-        # necessary encoding for message
-        ip0 = s.before.decode('ISO-8859-1')
-        #  print(ip0)
-        # get ip using msgID
-        ip1 = re.findall(r'Received:.*\[(.*)\]', ip0)[-1]
-        print(ip1)
-
     [print(row) for row in r0]
     conn.commit()
     s.logout()
